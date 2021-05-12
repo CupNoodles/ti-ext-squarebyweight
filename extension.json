@@ -1,0 +1,22 @@
+{
+    "code": "cupnoodles.squarebyweight",
+    "name": "Square by Weight",
+    "description": "Square Token Billing Manager for TastyIgniter.",
+    "version": "v1.0.0",
+    "author": "CupNoodles",
+    "icon": {
+      "class": "fa fa-file-invoice",
+      "backgroundColor": "#1B294B",
+      "color": "#fff"
+    },
+    "homepage": "",
+    "require": {
+      "igniter.cart" : "*",
+      "igniter.coupons": "*",
+      "igniter.local": "*",
+      "igniter.user": "*",
+      "igniter.payregister": "*",
+      "cupnoodles.pricebyweight": "*",
+      "cupnoodles.ordermenuedit": "*"
+    }
+  }
