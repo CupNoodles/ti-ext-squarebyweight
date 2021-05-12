@@ -17,3 +17,19 @@ Clone these files into `extensions/cupnoodles/squarebyweight/`.
 
 ### Usage 
 
+SquareByWeight extends the `Order` class, for the sole reason of allowing a checkout process to complete without the `order.processed` payment proccessing flag having been set. In order for the delayed payment option to work, you'll need to replace the `[Order]` tag in your checkout page template with `[OrderByWeight]`.
+
+in (probably) `<your_theme>/_pages/checkout/success.blade.php`
+
+replace 
+```
+'[order]':
+    hideReorderBtn: 1
+```
+with
+```
+'[orderPageByWeight]':
+    hideReorderBtn: 1
+```
+
+Don't forget to set a paid/unpaid status in the payment settings so your staff knows which orders still need to be paid for!
