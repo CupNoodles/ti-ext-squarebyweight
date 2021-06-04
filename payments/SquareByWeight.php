@@ -82,8 +82,12 @@ class SquareByWeight extends Square
 
         // Sandbox
         if($fields['nonce'] == '' && $this->isTestMode()){
+            // success
             $fields['nonce'] = "cnon:card-nonce-ok";
             $data['square_card_nonce'] = "cnon:card-nonce-ok";
+            //fail
+            //$fields['nonce'] = "cnon:card-nonce-declined";
+            //$data['square_card_nonce'] = "cnon:card-nonce-declined";
         }
 
         if (!$pay_later) {

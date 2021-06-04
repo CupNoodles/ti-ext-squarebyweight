@@ -2,16 +2,21 @@
     "use strict"
 
     var ProcessSquare = function (element, options) {
-        this.$el = $(element)
-        this.options = options || {}
-        this.$checkoutForm = this.$el.closest('#checkout-form')
-        this.square = null
+        this.$el = $(element);
+        this.options = options || {};
+        this.$checkoutForm = this.$el.closest('#checkout-form');
+        this.$modal = this.$el.closest("#creditCardModal");
+        this.square = null;
 
-        $('[name=payment][value=squarebyweight]', this.$checkoutForm).on('change', $.proxy(this.init, this))
+        if(this.$el.is(":visible")){
+            this.init();
+        }
+        
     }
 
     ProcessSquare.prototype.init = function () {
-        if (!$('#'+this.options.cardFields.card.elementId).length)
+
+        if (!$('#'+this.options.cardFields.cardNumber.elementId).length)
             return
 
         var spOptions = {
@@ -31,22 +36,22 @@
 
         this.square.build()
 
-        this.$checkoutForm.on('submitCheckoutForm', $.proxy(this.submitFormHandler, this))
+        $('.add-card').on('click', $.proxy(this.submitFormHandler, this))
     }
 
     ProcessSquare.prototype.submitFormHandler = function (event) {
-        var $form = this.$checkoutForm,
-            $paymentInput = $form.find('input[name="payment"]:checked')
-
-        if ($paymentInput.val() !== 'square') return
-
+        
         // Prevent the form from submitting with the default action
         event.preventDefault()
+        event.stopPropagation();
 
         this.square.requestCardNonce();
     }
 
     ProcessSquare.prototype.onResponseReceived = function (errors, nonce, cardData) {
+
+      
+
         var self = this,
             $form = this.$checkoutForm,
             verificationDetails = {
@@ -58,26 +63,49 @@
                     familyName: $('input[name="last_name"]', this.$checkoutForm).val(),
                 }
             }
-
+        
+        $('.payment-error').hide();
         if (errors) {
-            var $el = '<b>Encountered errors:</b>';
             errors.forEach(function (error) {
-                $el += '<div>' + error.message + '</div>'
+                $("#sq-" + error.field +  "-errors").html( error.message ).show();
             });
-            $form.find(this.options.errorSelector).html($el);
             return;
         }
 
+
+        var last_4 = cardData.last_4;
+
+        this.$modal.modal('hide');
+
         this.square.verifyBuyer(nonce, verificationDetails, function (err, response) {
             if (err == null) {
+
                 $form.find('input[name="square_card_nonce"]').val(nonce);
                 $form.find('input[name="square_card_token"]').val(response.token);
+                $form.find('input[name="payment"]').val('squarebyweight');
+                var html = '<span class="payment-title">Pay with Card ending in ' + last_4 + '</span><span class="payment-remove cusrsor-pointer"><i class="fas fa-times"></i></span>';
+                if($('#has-price-by-weight').val() == 1){
+                    html += '<span class="payment-desc"><br />Note: Since your order contains items that are priced by weight, your card will not be charged until an exact order total is calculated.</span>';
+                }
+                $('#payment-text').html(html);
 
-                // Switch back to default to submit form
-                $form.unbind('submitCheckoutForm').submit()
+                $('.payment-remove').on('click', function(){
+                    $form.find('input[name="square_card_nonce"]').val('');
+                    $form.find('input[name="square_card_token"]').val('');
+
+                    $('#payment-text').html('');
+                    $form.find('input[name="payment"]').val('');
+                });
             }
         });
     }
+
+    var inputstyles = {
+        fontSize: '16px',
+        color: '#000',            //Sets color of CVV & Zip
+        placeholderColor: '#A5A5A5', //Sets placeholder text color
+        backgroundColor: '#ebe6e0'  //Card entry background color
+    };
 
     ProcessSquare.DEFAULTS = {
         applicationId: undefined,
@@ -87,17 +115,25 @@
         errorSelector: '#square-card-errors',
         // Customize the CSS for SqPaymentForm iframe elements
         cardFields: {
-            card: {
+            cardNumber: {
                 elementId: 'sq-card',
-                inputStyle: {
-                    fontSize: '16px',
-                    autoFillColor: '#000',    //Sets color of card nbr & exp. date
-                    color: '#000',            //Sets color of CVV & Zip
-                    placeholderColor: '#A5A5A5', //Sets placeholder text color
-                    backgroundColor: '#FFF',  //Card entry background color
-                    cardIconColor: '#A5A5A5', //Card Icon color
-                },
+                placeholder: '0000 0000 0000 0000'
             },
+            cvv: {
+                elementId: 'sq-cvv',
+                placeholder: 'CVC'
+
+            },
+            expirationDate:{
+                elementId: 'sq-exp',
+                placeholder: 'MM/YY'
+            },
+            postalCode: {
+                elementId: 'sq-zip',
+                placeholder: '00000'
+
+            },
+            inputStyles: [inputstyles]
         }
     }
 
@@ -110,7 +146,10 @@
         var $this = $(this).first()
         var options = $.extend(true, {}, ProcessSquare.DEFAULTS, $this.data(), typeof option == 'object' && option)
 
-        return new ProcessSquare($this, options)
+        // only do this once per page load - important for modal display
+        if($('#sq-card').is("div")){
+            return new ProcessSquare($this, options)
+        }
     }
 
     $.fn.processSquare.Constructor = ProcessSquare

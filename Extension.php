@@ -50,8 +50,10 @@ class Extension extends BaseExtension
     {
         // why doesn't this happen automatically?
         Event::listen('igniter.checkout.beforePayment', function($order, $data){
-            if($data['payment'] == 'squarebyweight'){
-                $order->payment = 'squarebyweight';
+            if($order->order_total > 0){
+                if($data['payment'] == 'squarebyweight'){
+                    $order->payment = 'squarebyweight';
+                }
             }
         });
 
