@@ -18,9 +18,9 @@ class SquareByWeight extends Square
      */
     public function beforeRenderPaymentForm($host, $controller)
     {
-        $endpoint = $this->isTestMode() ? 'squareupsandbox' : 'squareup';
-        $controller->addJs('https://js.'.$endpoint.'.com/v2/paymentform', 'square-js');
-        $controller->addJs('$/cupnoodles/squarebyweight/assets/js/process.squarebyweight.js', 'process-square-js');
+        $endpoint = $this->isTestMode() ? 'sandbox.' : '';
+        $controller->addJs('https://'.$endpoint.'web.squarecdn.com/v1/square.js', 'square-js');
+        $controller->addJs('$/cupnoodles/squarebyweight/assets/js/webpaymentssdk.squarebyweight.js', 'webpayments-square-js');
     }
 
 

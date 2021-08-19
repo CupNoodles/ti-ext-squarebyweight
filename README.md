@@ -33,3 +33,6 @@ with
 ```
 
 Don't forget to set a paid/unpaid status in the payment settings so your staff knows which orders still need to be paid for!
+
+Known Issues:
+Payment Attempts aren't logging.

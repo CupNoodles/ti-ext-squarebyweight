@@ -64,7 +64,8 @@ class Extension extends BaseExtension
 
             if ($form->model instanceof Admin_Orders_Model) {
                 if ($form->model->processed == 0){
-                    Event::listen('admin.toolbar.extendButtons', function (Toolbar $toolbar) use ($form) {
+
+                    Event::listen('admin.toolbar.extendButtonsBefore', function (Toolbar $toolbar) use ($form) {
                         $toolbar->buttons['process_payment']  = [
                             'label' => 'lang:cupnoodles.squarebyweight::default.process_payment',
                             'class' => 'btn btn-primary',
