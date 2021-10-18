@@ -18,7 +18,6 @@ class OrderByWeight extends Order
         $this->page['hashParam'] = $this->param('hash');
         $this->page['order'] = $order = $this->getOrder();
 
-        $this->addJs('js/order.js', 'checkout-js');
 
         if (!$order OR !$order->isPaymentProcessed() && !$this->orderHasPaymentProfile($order))
             return Redirect::to($this->property('ordersPage'));
